@@ -6,19 +6,13 @@
 #include <cctype>
 #include <cmath>
 
-typedef struct {
-  double x;
-  double y;
-  double der;
-}point_t;
-
 double Func(double x);
 
 double FuncDer(double x);
 
-point_t* CreateTableByCheb(double lbord, double rbord, int numOfPoints);
+double FuncBreak(double x);
 
-double HermitCalc(point_t* points, int numOfPoints, double x);
+double FuncBreakDer(double x);
 
 
 #endif /*FUNC_H*/

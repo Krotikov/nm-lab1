@@ -1,9 +1,5 @@
 #include "test.h"
 
-double DeltaAbs(double x, double y) {
-  return fabs(x - y);
-}
-
 double FindMax(double* arr, int len) {
   double max = 0;
   for (int i = 0; i < len; ++i) {
@@ -13,13 +9,21 @@ double FindMax(double* arr, int len) {
   return max;
 }
 
-std::string FileName(std::string str, int symb) {
+std::string FileName(std::string str, int symb, double(*func)(double)) {
   char sym = symb + '0';
   std::string res = str + sym + ".txt";
+  std::string beg;
+  if (func == &Func)
+    beg = "Func/";
+  else if (func == &FuncBreak)
+    beg = "FuncBreak/";
+  else
+    beg = "noname/";
+  res = beg + res;
   return res;
 }
 
-void TestErr(int numOfPoints) {
+void TestErr(int numOfPoints, double(*func)(double), double(*der)(double)) {
   std::ofstream ypoint;
   std::ofstream xpoint;
   std::string s1 = "ypoint", s2 = "xpoint";
@@ -31,9 +35,9 @@ void TestErr(int numOfPoints) {
   double rbord = RBORD;
   double maxInPoint = 0, maxInMid = 0;
 
-  points = CreateTableByCheb(lbord, rbord, numOfPoints);
-  ypoint.open(FileName(s1, numOfPoints));
-  xpoint.open(FileName(s2, numOfPoints));
+  points = CreateTableByCheb(lbord, rbord, numOfPoints, func, der);
+  ypoint.open(FileName(s1, numOfPoints, func));
+  xpoint.open(FileName(s2, numOfPoints, func));
 
   for (int i = 0; i < numOfPoints - 1; ++i) {
     midPoints[i] = points[i + 1].x - points[i].x;
@@ -43,9 +47,9 @@ void TestErr(int numOfPoints) {
     xpoint << points[i].x << " "; //saving grid points
     ypoint << points[i].y << " ";
 
-    deltaInPoint[i] = fabs(HermitCalc(points, numOfPoints, points[i].x) - Func(points[i].x));
+    deltaInPoint[i] = fabs(HermitCalc(points, numOfPoints, points[i].x) - func(points[i].x));
     if (i != numOfPoints - 1)
-      deltaInMid[i] = fabs(HermitCalc(points, numOfPoints, midPoints[i]) - Func(midPoints[i]));
+      deltaInMid[i] = fabs(HermitCalc(points, numOfPoints, midPoints[i]) - func(midPoints[i]));
   }
 
   maxInPoint = FindMax(deltaInPoint, numOfPoints);
@@ -66,7 +70,7 @@ void TestErr(int numOfPoints) {
 }
 
 
-void TestHermit(int numOfPoints) {
+void TestHermit(int numOfPoints, double(*func)(double), double(*der)(double)) {
   std::ofstream fVal;
   std::ofstream fRes;
   std::ofstream fDelta;
@@ -78,14 +82,14 @@ void TestHermit(int numOfPoints) {
   double delta = 0;
   point_t* points;
 
-  points = CreateTableByCheb(lbord, rbord, numOfPoints);
-  fVal.open(FileName(s1, numOfPoints));
-  fRes.open(FileName(s2, numOfPoints));
-  fDelta.open(FileName(s3, numOfPoints));
+  points = CreateTableByCheb(lbord, rbord, numOfPoints, func, der);
+  fVal.open(FileName(s1, numOfPoints, func));
+  fRes.open(FileName(s2, numOfPoints, func));
+  fDelta.open(FileName(s3, numOfPoints, func));
 
   for (double x = lbord; x <= rbord; x += dx) {
     res = HermitCalc(points, numOfPoints, x);
-    delta = Func(x) - res;
+    delta = func(x) - res;
     fDelta << delta << " ";
     fVal << x << " ";
     fRes << res << " ";
@@ -97,6 +101,30 @@ void TestHermit(int numOfPoints) {
 
   free(points);
   
+  return;
+}
+
+void TestErrFromNumNodes(double(*func)(double), double(*der)(double)) {
+  double lbord = LBORD;
+  double rbord = RBORD;
+  double delta = 0;
+  point_t* points = nullptr;
+  std::ofstream fVal, fRes;
+
+  fVal.open("test_EFNNVal.txt");
+  fRes.open("test_EFNNRes.txt");
+
+  for (int i = NUM_MIN; i <= NUM_MAX; ++i) {
+    points = CreateTableByCheb(lbord, rbord, i, func, der);
+    delta = fabs(HermitCalc(points, i, lbord) - func(lbord));
+    fRes << delta << " ";
+    fVal << i << " ";
+    free(points);
+  }
+
+  fVal.close();
+  fRes.close();
+
   return;
 }
 
