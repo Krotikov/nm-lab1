@@ -1,16 +1,16 @@
 #include "hermit.h"
 
 double* ChebPolyRoots(int numOfPoints) {
-  double* roots = (double*)malloc(sizeof(double) * numOfPoints);
+  double* roots = new double[numOfPoints];
   for (int i = 0; i < numOfPoints; ++i) {
-    roots[i] = cos(M_PI * (2 * i + 1) / (2 * (numOfPoints + 1)));
+    roots[i] = cos(M_PI * (2 * i + 1) / (2 * (numOfPoints))); //in normal formula n + 1, however in my case i already have added +1
   }
 
   return roots;
 }
 
 point_t* CreateTableByCheb(double lbord, double rbord, int numOfPoints, double(*func)(double), double(*der)(double)) {
-  point_t* points = (point_t*)malloc(sizeof(point_t) * numOfPoints);
+  point_t* points = new point_t[numOfPoints];
   double* roots = ChebPolyRoots(numOfPoints);
 
   for (int i = 0; i < numOfPoints; ++i) {
@@ -18,6 +18,8 @@ point_t* CreateTableByCheb(double lbord, double rbord, int numOfPoints, double(*
     points[i].y = func(points[i].x);
     points[i].der = der(points[i].x);
   }
+
+  delete[] roots;
 
   return points;
 }

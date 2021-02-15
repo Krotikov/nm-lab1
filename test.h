@@ -9,7 +9,7 @@
 #define LBORD -2
 #define RBORD 2
 #define NUM_MIN 2
-#define NUM_MAX 10
+#define NUM_MAX 50
 #define DELTA 1e-2
 
 typedef enum {

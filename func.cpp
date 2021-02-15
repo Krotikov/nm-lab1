@@ -16,6 +16,8 @@ double FuncBreak(double x) {
 }
 
 double FuncBreakDer(double x) {
+  if (x = 0.5)
+    return 0;
   double res = ((x * x + 4 * (sin(x) - sin(0.5)) - 0.25) + (4 * sin(0.5) - 1.75) / fabs(x * x + 4 * (sin(x) - sin(0.5)) - 0.25) + (4 * sin(0.5) - 1.75)) * (2 * x + 4 * cos(x));
   return res;
 }
