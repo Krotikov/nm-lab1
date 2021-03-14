@@ -23,6 +23,9 @@ int main() {
   TestErr(numOfPoints3, &Func, &FuncDer);
   TestHermit(numOfPoints3, &Func, &FuncDer);
 
+  //For normal function
+  TestErrFromNumNodes(&Func, &FuncDer);
+
   //--------------------------------------------
   cout << "For function with break:" << endl;
   cout << "For 2 points:" << endl;

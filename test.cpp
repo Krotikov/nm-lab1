@@ -106,6 +106,20 @@ void TestHermit(int numOfPoints, double(*func)(double), double(*der)(double)) {
   return;
 }
 
+std::string FileNameStill(std::string str, double(*func)(double)) {
+  std::string res;
+  std::string beg;
+  if (func == &Func)
+    beg = "Func/";
+  else if (func == &FuncBreak)
+    beg = "FuncBreak/";
+  else
+    beg = "noname/";
+  res = beg + str;
+
+  return res;
+}
+
 
 
 void TestErrFromNumNodes(double(*func)(double), double(*der)(double)) {
@@ -116,9 +130,10 @@ void TestErrFromNumNodes(double(*func)(double), double(*der)(double)) {
   double tmp = 0;
   point_t* points = nullptr;
   std::ofstream fVal, fRes;
+  std::string s1 = "test_EFNNVal.txt", s2 = "test_EFNNRes.txt";
 
-  fVal.open("test_EFNNVal.txt");
-  fRes.open("test_EFNNRes.txt");
+  fVal.open(FileNameStill(s1, func));
+  fRes.open(FileNameStill(s2, func));
 
   for (int i = NUM_MIN; i <= NUM_MAX; ++i) {
     points = CreateTableByCheb(lbord, rbord, i, func, der);
